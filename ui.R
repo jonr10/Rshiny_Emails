@@ -21,7 +21,7 @@ navbarPage("Email Analysis",
                                                     min = 1,  max = 100,  value = 50)
                                 ),
                                 mainPanel( 
-                                        plotOutput("wholeplot")
+                                        plotOutput("wholeword")
                                 )
                         )
                )
@@ -30,7 +30,7 @@ navbarPage("Email Analysis",
                             sidebarLayout(
                                     # Sidebar with a slider and selection inputs
                                     sidebarPanel(
-                                            textInput(inputId = "Who did you email", 
+                                            textInput(inputId = "Who_emailed", 
                                                       label = "Individual",
                                                       width = '100%',
                                                       value = "Ross Wyatt"
@@ -38,7 +38,9 @@ navbarPage("Email Analysis",
                                             
                                     ),
                                     mainPanel( 
-                                            plotOutput("singleplot")
+                                            textOutput("text1"),
+                                            textOutput("text2"),
+                                            textOutput("indiv_emailed")
                                     )
                             )
                    )
