@@ -7,10 +7,16 @@
 function(input, output, session) 
         {
         
+        test_text <- c("PLACEHOLDER TEXT WILL GO HERE", "this might break though")
+                output$text1 <- renderText(test_text)
+                output$text2 <- renderText(test_text)
+                output$indiv_emailed <- renderText(input$Who_emailed)
+                
+        
         # Make the wordcloud drawing predictable during a session
         wordcloud_rep <- repeatable(wordcloud)
         
-        output$wholeplot <- renderPlot({
+        output$wholeword <- renderPlot({
                 wordcloud(shiny_corpus, max.words = input$max, scale = c(4,0.5), rot.per = 0.35, 
                           min.freq = input$freq, random.order = r_order$logi[r_order$text==input$random_select])
                 })
