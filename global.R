@@ -2,7 +2,6 @@
 
 ######### Global.R following the RShiny cheatsheet approach
 
-
 setwd("/Users/jonathanroberts/Documents/R/RShiny_Emails")
 
 
@@ -47,11 +46,11 @@ tidy_stop_subject <- function(text_df) {
 email_text<-tidy_stop_email(raw_data)
 subject_text<-tidy_stop_subject(raw_data)
 
-shiny_corpus<-raw_data$Subject
+shiny_corpus<-subject_text$word
 
-subject_text %>%
-        count(word) %>%
-        with(wordcloud(word, n, max.words = 60))
+#subject_text %>%
+#        count(word) %>%
+#        with(wordcloud(word, n, max.words = 60))
 
 
 
