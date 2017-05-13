@@ -19,13 +19,13 @@ lapply(libraries, library, character.only = TRUE)
 raw_data <- read.csv("../SensitiveData/2017_sent_emails.CSV",  colClasses = "character",stringsAsFactors = F)
 email_stopwords <- read.csv("../SensitiveData/email_stopwords.CSV", colClasses = "character")
 
-
 #rename the columns of the text and recipients so that it is easy to call later 
 colnames(raw_data)[2]<-"email"
 colnames(raw_data)[6]<-"who"
 
 
-##Make a couple of functions to unnest and tidy up the data
+############USEFUL FUNCTIONS
+####Make a couple of functions to unnest and tidy up the data
 #TODO:  for some reason this function doesn't allow you to pass "email" or "Subject" 
 #       as an argument and work in the way that you would expect. 
 
@@ -43,10 +43,55 @@ tidy_stop_subject <- function(text_df) {
         clean_Qdf <- clean_Qdf %>% anti_join(email_stopwords)
 }
 
+#####Bigrams Functions
+## TODO: i want to be able to call to $email or $Subject in the defintion of the function, but can't do this in the obvious way.
+
+mostcommon <- function(text_df,n=1,x=20) {
+        if(n==1){
+                #manipulate the data so that each word has its own row
+                tidy_Qdf<- text_df %>% unnest_tokens(word,"Subject",to_lower=TRUE)
+                #remove stopwords
+                clean_Qdf <- tidy_Qdf %>% anti_join(stop_words)  
+                clean_Qdf <- clean_Qdf %>% anti_join(email_stopwords)
+                #count the occurrences of each word, sort by the number of occurrences, and take the top x
+                top_x <- (clean_Qdf %>% count(word,sort=TRUE))[1:x,]
+        }
+        else if(n==2){
+                #manipulate the data so that each bigram has its own row
+                tidy_Qdf<- text_df %>% unnest_tokens(bigram,"Subject",to_lower=TRUE,token="ngrams",n=2)
+                #separate bigrams into individual words
+                bigrams_separated <- tidy_Qdf %>% separate(bigram, c("word1", "word2"), sep = " ")
+                #remove cases where one of the words is a stopword
+                bigrams_filtered <- bigrams_separated %>%
+                        filter(!word1 %in% stop_words$word) %>%
+                        filter(!word2 %in% stop_words$word)
+                
+                #count the occurrences of word pairs, sort by the number of occurrences, and take the top x
+                top_x <- as.data.frame((bigrams_filtered %>% count(word1, word2, sort = TRUE))[1:x,])
+                
+                #rejoin the words back into bigrams
+                top_x$phrase <- sapply(1:x,
+                                       function(x)
+                                               paste(top_x[x,]$word1,top_x[x,]$word2))
+                #only keep the bigrams
+                top_x <- top_x[,!(names(top_x) %in% c("word1","word2"))]
+        }
+        who<-rep(text_df$who[1],x)
+        return(cbind(top_x,who))
+}
+
+
+
+##Call Functions and get some data ready for the UI/Server calls
+
 email_text<-tidy_stop_email(raw_data)
 subject_text<-tidy_stop_subject(raw_data)
-
 shiny_corpus<-subject_text$word
+commonBigrams <- raw_data %>% mostcommon(n=2)
+
+
+ggplot(commonBigrams, aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
+        xlab("Terms") + ylab("Count") + coord_flip() 
 
 #subject_text %>%
 #        count(word) %>%
