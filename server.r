@@ -16,6 +16,9 @@ function(input, output, session)
         # Make the wordcloud drawing predictable during a session
         wordcloud_rep <- repeatable(wordcloud)
         
+        output$all_bigrams <- renderPlot({ggplot(commonBigrams, aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
+                        xlab("Terms") + ylab("Count") + coord_flip()})
+        
         output$wholeword <- renderPlot({
                 wordcloud(shiny_corpus, max.words = input$max, scale = c(4,0.5), rot.per = 0.35, 
                           min.freq = input$freq, random.order = r_order$logi[r_order$text==input$random_select])
