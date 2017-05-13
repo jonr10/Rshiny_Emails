@@ -21,7 +21,8 @@ navbarPage("Email Analysis",
                                                     min = 1,  max = 100,  value = 50)
                                 ),
                                 mainPanel( 
-                                        plotOutput("wholeword")
+                                        plotOutput("wholeword"),
+                                        plotOutput("all_bigrams")
                                 )
                         )
                )
