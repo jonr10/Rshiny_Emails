@@ -41,7 +41,9 @@ navbarPage("Email Analysis",
                                     mainPanel( 
                                             textOutput("text1"),
                                             textOutput("text2"),
-                                            textOutput("indiv_emailed")
+                                            textOutput("indiv_emailed"),
+                                            plotOutput("singleplot"),
+                                            plotOutput("singleplot2")
                                     )
                             )
                    )
