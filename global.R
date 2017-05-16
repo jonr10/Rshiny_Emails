@@ -25,6 +25,7 @@ colnames(raw_data)[6]<-"who"
 
 
 ############USEFUL FUNCTIONS
+
 ####Make a couple of functions to unnest and tidy up the data
 #TODO:  for some reason this function doesn't allow you to pass "email" or "Subject" 
 #       as an argument and work in the way that you would expect. 
@@ -82,7 +83,26 @@ mostcommon <- function(text_df,n=1,x=20) {
 
 
 
-##Call Functions and get some data ready for the UI/Server calls
+######Strip out data for one person
+
+#i've design this function to only accept one name and c
+#I call it repeatedly if i want to give it lots of people to analyse at once. 
+#I guess this bit could accept a character vector.
+
+individual_emails<-function(source_data, who = "Ross"){
+        
+        #vector to take the instances where the match is true
+        who<-paste0("\\b",tolower(who),"\\b")
+        v<-grepl(who, tolower(source_data$who))
+        #filter on matches
+        person_data<-(source_data[v,])
+        return(person_data)
+}
+
+
+
+#######Call Functions and get some data ready for the UI/Server calls
+##Mostly calls to the whole corpus
 
 email_text<-tidy_stop_email(raw_data)
 subject_text<-tidy_stop_subject(raw_data)
@@ -90,6 +110,7 @@ shiny_corpus<-subject_text$word
 commonBigrams <- raw_data %>% mostcommon(n=2)
 
 
+#######TESTBED for code before i drop it in server.ui
 ggplot(commonBigrams, aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
         xlab("Terms") + ylab("Count") + coord_flip() 
 
