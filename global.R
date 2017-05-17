@@ -18,6 +18,7 @@ lapply(libraries, library, character.only = TRUE)
 #this is the csv that outlook spits out through it's export function. 
 raw_data <- read.csv("../SensitiveData/2017_sent_emails.CSV",  colClasses = "character",stringsAsFactors = F)
 email_stopwords <- read.csv("../SensitiveData/email_stopwords.CSV", colClasses = "character")
+bing <- get_sentiments("bing")
 
 #rename the columns of the text and recipients so that it is easy to call later 
 colnames(raw_data)[2]<-"email"
@@ -117,6 +118,20 @@ ggplot(commonBigrams, aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "ide
 #subject_text %>%
 #        count(word) %>%
 #        with(wordcloud(word, n, max.words = 60))
+
+
+### Sentiment cloud
+####Default is Ross
+ind_emails_def<-individual_emails(raw_data)
+ind_text_def<-tidy_stop_email(ind_emails_def)
+to_plot  <- ind_text_def %>%
+        inner_join(bing) %>%
+        count(word, sentiment, sort = TRUE) %>%
+        acast(word ~ sentiment, value.var = "n", fill = 0)
+
+        comparison.cloud(to_plot, colors = c("#F8766D", "#00BFC4"),
+                         max.words = 100)
+
 
 
 
