@@ -43,7 +43,8 @@ navbarPage("Email Analysis",
                                             textOutput("text2"),
                                             textOutput("indiv_emailed"),
                                             plotOutput("singleplot"),
-                                            plotOutput("singleplot2")
+                                            plotOutput("singleplot2"),
+                                            plotOutput("singleplot3")
                                     )
                             )
                    )
