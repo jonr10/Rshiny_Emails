@@ -37,8 +37,16 @@ function(input, output, session)
         ####Default is Ross
         ind_emails_def<-individual_emails(raw_data)
         ind_text_def<-tidy_stop_email(ind_emails_def)
+        #For basic word cloud
         indiv_corpus_def<-ind_text_def$word
+        #For Sentiment cloud
+        to_plot  <- ind_text_def %>%
+                inner_join(bing) %>%
+                count(word, sentiment, sort = TRUE) %>%
+                acast(word ~ sentiment, value.var = "n", fill = 0)
         
+       
+       
         output$singleplot <- renderPlot({
                 wordcloud(indiv_corpus_def, max.words = input$max, scale = c(4,0.5), rot.per = 0.35, 
                           min.freq = input$freq, random.order = r_order$logi[r_order$text==input$random_select])
@@ -47,6 +55,11 @@ function(input, output, session)
         output$singleplot2 <- renderPlot({
                 wordcloud(indiv_corpus(), max.words = input$max, scale = c(4,0.5), rot.per = 0.35, 
                           min.freq = input$freq, random.order = r_order$logi[r_order$text==input$random_select])
+        })
+        
+        output$singleplot3 <- renderPlot({
+                comparison.cloud(to_plot, colors = c("#F8766D", "#00BFC4"),
+                                 max.words = 100)
         })
         
 
