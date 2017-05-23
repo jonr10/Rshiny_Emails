@@ -33,13 +33,12 @@ navbarPage("Email Analysis",
                                                       width = '100%',
                                                       value = "Ross"
                                                 ),
-                                            textOutput("text2")
+                                            plotOutput("singleplot2")
                                     ),
                                     mainPanel(
                                             textOutput("text1"),
                                             textOutput("indiv_emailed"),
                                             plotOutput("singleplot"),
-                                            plotOutput("singleplot2"),
                                             plotOutput("singleplot3")
                                     )
                             )
