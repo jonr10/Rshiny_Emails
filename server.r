@@ -34,7 +34,7 @@ function(input, output, session)
         indiv_corpus<-reactive({
         ind_emails<-individual_emails(raw_data, input$Who_emailed)
         #Make the tidy data using unnest and removing stop words
-        ind_text<-tidy_stop_email(ind_emails)
+        ind_text<-tidy_stop(ind_emails, which_text="email")
         return(ind_text)
         })
 
@@ -63,7 +63,7 @@ function(input, output, session)
 
         ####Default is Ross
         ind_emails_def<-individual_emails(raw_data)
-        ind_text_def<-tidy_stop_email(ind_emails_def)
+        ind_text_def<-tidy_stop(ind_emails_def, which_text=email)
         #For basic word cloud
         indiv_corpus_def<-ind_text_def$word
 
