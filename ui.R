@@ -4,25 +4,22 @@ source(file = "global.R")
 
 
 navbarPage("Email Analysis",
-               tabPanel("All Email",
+
+                tabPanel("All Email",
                         sidebarLayout(
                                 # Sidebar with a slider and selection inputs
                                 sidebarPanel(
-                                        selectInput("random_select", "Random order?:",
-                                                    choices = r_order$text),
-                                        sliderInput("colour_num",
-                                                    "Number of colours:",
-                                                    min = 3,  max = 8, value = 8),
                                         sliderInput("freq",
                                                     "Minimum Frequency:",
                                                     min = 1,  max = 500, value = 5),
                                         sliderInput("max",
                                                     "Maximum Number of Words:",
-                                                    min = 1,  max = 100,  value = 50)
+                                                    min = 1,  max = 100,  value = 50),
+                                        plotOutput("wholeword")
                                 ),
-                                mainPanel( 
-                                        plotOutput("wholeword"),
-                                        plotOutput("all_bigrams")
+                                mainPanel(
+                                        plotOutput("all_bigrams_subj"),
+                                        plotOutput("all_bigrams_email")
                                 )
                         )
                )
@@ -31,16 +28,15 @@ navbarPage("Email Analysis",
                             sidebarLayout(
                                     # Sidebar with a slider and selection inputs
                                     sidebarPanel(
-                                            textInput(inputId = "Who_emailed", 
+                                            textInput(inputId = "Who_emailed",
                                                       label = "Individual",
                                                       width = '100%',
-                                                      value = "Ross Wyatt"
-                                                )
-                                            
+                                                      value = "Ross"
+                                                ),
+                                            textOutput("text2")
                                     ),
-                                    mainPanel( 
+                                    mainPanel(
                                             textOutput("text1"),
-                                            textOutput("text2"),
                                             textOutput("indiv_emailed"),
                                             plotOutput("singleplot"),
                                             plotOutput("singleplot2"),
@@ -49,29 +45,34 @@ navbarPage("Email Analysis",
                             )
                    )
            ,
-           
+
            tabPanel("Emails to many people",
                     sidebarLayout(
                             # Sidebar with a slider and selection inputs
                             sidebarPanel(
-                                    textInput(inputId = "Who did you email #1", 
+                                    textInput(inputId = "Who did you email #1",
                                               label = "Individual #1",
                                               width = '100%',
                                               value = "Ross Wyatt"
                                     ),
-                                    textInput(inputId = "Who did you email #2", 
+                                    textInput(inputId = "Who did you email #2",
                                               label = "Individual #2",
                                               width = '100%',
                                               value = "Mike Marriott"
                                     )
-                                    
+
                             ),
-                            mainPanel( 
+                            mainPanel(
                                     plotOutput("multiplot")
                             )
                     )
-                )
-       
+                ),
+           tabPanel("Debug Page",
+                    fluidRow(
+                            textOutput("test")
+                    )
+           )
+
 
 )
 
