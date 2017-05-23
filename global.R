@@ -28,8 +28,6 @@ colnames(raw_data)[6]<-"who"
 ############USEFUL FUNCTIONS
 
 ####Make a couple of functions to unnest and tidy up the data
-#TODO:  for some reason this function doesn't allow you to pass "email" or "Subject"
-#       as an argument and work in the way that you would expect.
 
 tidy_stop_email <- function(text_df) {
         #manipulate the data so that each word has its own row
@@ -39,8 +37,9 @@ tidy_stop_email <- function(text_df) {
         clean_Qdf <- clean_Qdf %>% anti_join(email_stopwords)
 }
 
-tidy_stop_subject <- function(text_df) {
-        tidy_Qdf<- text_df %>% unnest_tokens(word,"Subject",to_lower=TRUE)
+tidy_stop<- function(text_df, which_text="email") {
+        word<-"word"
+        tidy_Qdf<- text_df %>% unnest_tokens_(word,"Subject",to_lower=TRUE)
         clean_Qdf <- tidy_Qdf %>% anti_join(stop_words)
         clean_Qdf <- clean_Qdf %>% anti_join(email_stopwords)
 }
@@ -56,7 +55,6 @@ mostcommon <- function(text_df,n=1,x=20, which_text = "Subject") {
         if(n==1){
                 #wierd thing to solve an issue with tidytext reading in strings for variables
                 word<-"word"
-
                 # NOTE THE UNDERSCORE - solves the tidytext issue
                 tidy_Qdf<- text_df %>% unnest_tokens_(word,which_text,to_lower=TRUE)
                 clean_Qdf <- tidy_Qdf %>% anti_join(stop_words)
@@ -106,8 +104,8 @@ individual_emails<-function(source_data, who = "Ross"){
 #######Call Functions and get some data ready for the UI/Server calls
 ##Mostly calls to the whole corpus
 
-email_text<-tidy_stop_email(raw_data)
-subject_text<-tidy_stop_subject(raw_data)
+email_text<-tidy_stop(raw_data, which_text = "email")
+subject_text<-tidy_stop(raw_data, which_text = "Subject")
 subject_corpus<-subject_text$word
 email_corpus<-email_text$word
 commonBigrams <- raw_data %>% mostcommon(n=2)
