@@ -16,7 +16,7 @@ lapply(libraries, library, character.only = TRUE)
 ##Read in email data and special stopwords, e.g. things that appear in my signature.
 
 #this is the csv that outlook spits out through it's export function.
-raw_data <- read.csv("../SensitiveData/2017_sent_emails.CSV",  colClasses = "character",stringsAsFactors = F)
+raw_data <- read.csv("../SensitiveData/2017_sent_emails_FebtoMay24.CSV",  colClasses = "character",stringsAsFactors = F)
 email_stopwords <- read.csv("../SensitiveData/email_stopwords.CSV", colClasses = "character")
 bing <- get_sentiments("bing")
 
@@ -67,7 +67,11 @@ mostcommon <- function(text_df,n=1,x=20, which_text = "Subject") {
                 bigrams_separated <- tidy_Qdf %>% separate(bigram, c("word1", "word2"), sep = " ")
                 bigrams_filtered <- bigrams_separated %>%
                         filter(!word1 %in% stop_words$word) %>%
-                        filter(!word2 %in% stop_words$word)
+                        filter(!word2 %in% stop_words$word) %>%
+                        filter(!word1 %in% email_stopwords$word) %>%
+                        filter(!word2 %in% email_stopwords$word)
+
+
                 top_x <- as.data.frame((bigrams_filtered %>% count(word1, word2, sort = TRUE))[1:x,])
 
                 #rejoin the words back into bigrams
