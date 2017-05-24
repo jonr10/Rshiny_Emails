@@ -31,13 +31,30 @@ function(input, output, session)
                 })
 
         ####### OUTPUT FOR ONE PERSON
+        ##MAke reactive versions of the functions in server.
         indiv_corpus<-reactive({
         ind_emails<-individual_emails(raw_data, input$Who_emailed)
-        #Make the tidy data using unnest and removing stop words
         ind_text<-tidy_stop(ind_emails, which_text="email")
         return(ind_text)
         })
 
+        indiv_Bigrams<-reactive({
+                ind_emails<-individual_emails(raw_data, input$Who_emailed)
+                com_Big<-mostcommon(ind_emails, n=2)
+                return(com_Big)
+        })
+
+        indiv_Bigrams_email<-reactive({
+                ind_emails<-individual_emails(raw_data, input$Who_emailed)
+                com_Big<-mostcommon(ind_emails, n=2, which_text = "email")
+                return(com_Big)
+        })
+
+        output$indiv_Bigram <- renderPlot({ggplot(indiv_Bigrams(), aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
+                        xlab("Terms") + ylab("Count") + coord_flip()})
+
+        output$indiv_Bigram_email <- renderPlot({ggplot(indiv_Bigrams_email(), aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
+                        xlab("Terms") + ylab("Count") + coord_flip()})
 
         output$singleplot2 <- renderPlot({
                 wordcloud(indiv_corpus()$word, max.words = input$max, scale = c(4,0.5), rot.per = 0.35,
