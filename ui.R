@@ -31,7 +31,7 @@ navbarPage("Email Analysis",
                                             textInput(inputId = "Who_emailed",
                                                       label = "Individual",
                                                       width = '100%',
-                                                      value = "Ross"
+                                                      value = "Wyatt"
                                                 ),
                                             plotOutput("singleplot2"),
                                             plotOutput("singleplot3")
@@ -51,12 +51,12 @@ navbarPage("Email Analysis",
                                     textInput(inputId = "Person1",
                                               label = "Individual #1",
                                               width = '100%',
-                                              value = "Ross Wyatt"
+                                              value = "Wyatt"
                                     ),
                                     textInput(inputId = "Person2",
                                               label = "Individual #2",
                                               width = '100%',
-                                              value = "Mike Marriott"
+                                              value = "Marriott"
                                     ),
                                     textOutput("text1"),
                                     textOutput("text2"),
@@ -64,7 +64,8 @@ navbarPage("Email Analysis",
 
                             ),
                             mainPanel(
-                                    plotOutput("multiplot")
+                                    plotOutput("multiplot"),
+                                    plotOutput("multiplot_email")
                             )
                     )
                 ),
