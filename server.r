@@ -92,26 +92,48 @@ function(input, output, session)
                 return(commonBigrams)
         })
 
-        multi_corpus_test<-reactive({
-                ### make a char vector of the people you want to search on
+        multi_bigrams_email<-reactive({
                 sent_to<-c(input$Person1, input$Person2)
-                ### pass into the pre-backed functions
-                #ind_emails<-individual_emails(raw_data, input$Who_emailed)
-                #ind_text<-tidy_stop(ind_emails, which_text="email")
-                multi_text<-sent_to
-                return(multi_text)
+                for (i in 1:length(sent_to)){
+                        if (i==1){
+                                input_data<-individual_emails(raw_data, who=sent_to[i])
+                                #commonWords <- input_data %>% mostcommon() %>% cbind(sent_to[i])
+                                commonBigrams <- input_data %>% mostcommon(n=2, which_text = "email") %>% cbind(sent_to[i])
+                        }
+                        else {
+                                input_data<-individual_emails(raw_data, who=sent_to[i])
+                                #commonWords <- input_data %>% mostcommon() %>% cbind(sent_to[i]) %>% rbind(commonWords)
+                                commonBigrams <- input_data %>% mostcommon(n=2, which_text = "email") %>% cbind(sent_to[i]) %>% rbind(commonBigrams)
+                        }
+                }
+                return(commonBigrams)
         })
-
-
 
 
          output$multiplot <- renderPlot({ggplot(multi_bigrams(), aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
                          xlab("Terms") + ylab("Count") + coord_flip() +  facet_wrap(~who, ncol = 3, scales = "free_x")
          })
 
+         output$multiplot_email <- renderPlot({ggplot(multi_bigrams_email(), aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
+                         xlab("Terms") + ylab("Count") + coord_flip() +  facet_wrap(~who, ncol = 3, scales = "free_x")
+         })
+
+
 
         ## TODO: REMOVE ONE PAGE TESTED output$text1 <- renderText(input$Person1)
         ## TODO: REMOVE ONE PAGE TESTED output$text2 <- renderText(input$Person2)
+
+         multi_corpus_test<-reactive({
+                 ### make a char vector of the people you want to search on
+                 sent_to<-c(input$Person1, input$Person2)
+                 ### pass into the pre-backed functions
+                 #ind_emails<-individual_emails(raw_data, input$Who_emailed)
+                 #ind_text<-tidy_stop(ind_emails, which_text="email")
+                 multi_text<-sent_to
+                 return(multi_text)
+         })
+
+
         output$text3 <- renderText(multi_corpus_test())
 
 
