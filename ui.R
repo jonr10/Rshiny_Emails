@@ -48,16 +48,19 @@ navbarPage("Email Analysis",
                     sidebarLayout(
                             # Sidebar with a slider and selection inputs
                             sidebarPanel(
-                                    textInput(inputId = "Who did you email #1",
+                                    textInput(inputId = "Person1",
                                               label = "Individual #1",
                                               width = '100%',
                                               value = "Ross Wyatt"
                                     ),
-                                    textInput(inputId = "Who did you email #2",
+                                    textInput(inputId = "Person2",
                                               label = "Individual #2",
                                               width = '100%',
                                               value = "Mike Marriott"
-                                    )
+                                    ),
+                                    textOutput("text1"),
+                                    textOutput("text2"),
+                                    textOutput("text3")
 
                             ),
                             mainPanel(
