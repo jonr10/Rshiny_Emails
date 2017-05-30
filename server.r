@@ -9,8 +9,8 @@ function(input, output, session)
 
         ######## BITS TO PUT IN TO TEST THE THING
         test_text <- c("PLACEHOLDER TEXT WILL GO HERE", "this might break though")
-        output$text1 <- renderText(test_text)
-        output$text2 <- renderText(test_text)
+        output$test1 <- renderText(test_text[1])
+        output$test2 <- renderText(test_text[2])
         output$indiv_emailed <- renderText(input$Who_emailed)
         output$test <- renderPrint(head(indiv_corpus()$word))
 
@@ -84,10 +84,6 @@ function(input, output, session)
         #For basic word cloud
         indiv_corpus_def<-ind_text_def$word
 
-
-
-
-
         output$singleplot <- renderPlot({
                 wordcloud(indiv_corpus_def, max.words = input$max, scale = c(4,0.5), rot.per = 0.35,
                           min.freq = input$freq, random.order = FALSE)
@@ -99,11 +95,60 @@ function(input, output, session)
 
 
         ####### OUTPUT FOR MULTI-PERSON
-        output$multiplot <- renderPlot({
+
+        multi_corpus<-reactive({
+                sent_to<-c(input$Person1, input$Person2)
+                for (i in 1:length(sent_to)){
+                        if (i==1){
+                                input_data<-individual_emails(raw_data, who=sent_to[i])
+                                #commonWords <- input_data %>% mostcommon() %>% cbind(sent_to[i])
+                                commonBigrams <- input_data %>% mostcommon(n=2) %>% cbind(sent_to[i])
+                        }
+                        else {
+                                input_data<-individual_emails(raw_data, who=sent_to[i])
+                                #commonWords <- input_data %>% mostcommon() %>% cbind(sent_to[i]) %>% rbind(commonWords)
+                                commonBigrams <- input_data %>% mostcommon(n=2) %>% cbind(sent_to[i]) %>% rbind(commonBigrams)
+                        }
+                }
+
+        })
+
+        multi_corpus_test<-reactive({
+                ### make a char vector of the people you want to search on
+                sent_to<-c(input$Person1, input$Person2)
+                ### pass into the pre-backed functions
+                #ind_emails<-individual_emails(raw_data, input$Who_emailed)
+                #ind_text<-tidy_stop(ind_emails, which_text="email")
+                multi_text<-sent_to
+                return(multi_text)
+        })
+
+
+
+         output$multiplot <- renderPlot({
                 wordcloud(shiny_corpus, max.words = input$max, scale = c(4,0.5), rot.per = 0.35,
                           min.freq = input$freq, random.order = r_order$logi[r_order$text==input$random_select])
                 })
 
-        }
+
+
+
+        ## TODO: REMOVE ONE PAGE TESTED output$text1 <- renderText(input$Person1)
+        ## TODO: REMOVE ONE PAGE TESTED output$text2 <- renderText(input$Person2)
+        output$text3 <- renderText(multi_corpus_test())
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
