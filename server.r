@@ -61,10 +61,6 @@ function(input, output, session)
                           min.freq = input$freq, random.order = FALSE)
         })
 
-
-
-
-
         #For Sentiment cloud
         to_plot  <- ind_text_def %>%
                 inner_join(bing) %>%
@@ -77,26 +73,9 @@ function(input, output, session)
         })
 
 
-
-        ####Default is Ross
-        ind_emails_def<-individual_emails(raw_data)
-        ind_text_def<-tidy_stop(ind_emails_def, which_text=email)
-        #For basic word cloud
-        indiv_corpus_def<-ind_text_def$word
-
-        output$singleplot <- renderPlot({
-                wordcloud(indiv_corpus_def, max.words = input$max, scale = c(4,0.5), rot.per = 0.35,
-                          min.freq = input$freq, random.order = FALSE)
-                })
-
-
-
-
-
-
         ####### OUTPUT FOR MULTI-PERSON
 
-        multi_corpus<-reactive({
+        multi_bigrams<-reactive({
                 sent_to<-c(input$Person1, input$Person2)
                 for (i in 1:length(sent_to)){
                         if (i==1){
@@ -110,7 +89,7 @@ function(input, output, session)
                                 commonBigrams <- input_data %>% mostcommon(n=2) %>% cbind(sent_to[i]) %>% rbind(commonBigrams)
                         }
                 }
-
+                return(commonBigrams)
         })
 
         multi_corpus_test<-reactive({
@@ -125,17 +104,36 @@ function(input, output, session)
 
 
 
-         output$multiplot <- renderPlot({
-                wordcloud(shiny_corpus, max.words = input$max, scale = c(4,0.5), rot.per = 0.35,
-                          min.freq = input$freq, random.order = r_order$logi[r_order$text==input$random_select])
-                })
 
-
+         output$multiplot <- renderPlot({ggplot(multi_bigrams(), aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
+                         xlab("Terms") + ylab("Count") + coord_flip() +  facet_wrap(~who, ncol = 3, scales = "free_x")
+         })
 
 
         ## TODO: REMOVE ONE PAGE TESTED output$text1 <- renderText(input$Person1)
         ## TODO: REMOVE ONE PAGE TESTED output$text2 <- renderText(input$Person2)
         output$text3 <- renderText(multi_corpus_test())
+
+
+
+        ######Code graveyard
+
+
+        ####Default is Ross
+        ind_emails_def<-individual_emails(raw_data)
+        ind_text_def<-tidy_stop(ind_emails_def, which_text=email)
+        #For basic word cloud
+        indiv_corpus_def<-ind_text_def$word
+
+        output$singleplot <- renderPlot({
+                wordcloud(indiv_corpus_def, max.words = input$max, scale = c(4,0.5), rot.per = 0.35,
+                          min.freq = input$freq, random.order = FALSE)
+        })
+
+
+
+
+
 
 
 }
