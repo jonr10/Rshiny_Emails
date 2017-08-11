@@ -16,14 +16,16 @@ lapply(libraries, library, character.only = TRUE)
 ##Read in email data and special stopwords, e.g. things that appear in my signature.
 
 #this is the csv that outlook spits out through it's export function.
-raw_data <- read.csv("../SensitiveData/2017_sent_emails_FebtoMay24.CSV",  colClasses = "character",stringsAsFactors = F)
+raw_data <- readr::read_csv("../SensitiveData/2017_sent_emails_FebtoMay24.CSV")
+useful_data<-data_frame(raw_data$Subject,raw_data$Body, raw_data$`From: (Name)`, raw_data$`To: (Name)`)
 email_stopwords <- read.csv("../SensitiveData/email_stopwords.CSV", colClasses = "character")
 bing <- get_sentiments("bing")
 
 #rename the columns of the text and recipients so that it is easy to call later
-colnames(raw_data)[2]<-"email"
-colnames(raw_data)[6]<-"who"
-
+colnames(useful_data)[1]<-"Subject"
+colnames(useful_data)[2]<-"Email"
+colnames(useful_data)[3]<-"From"
+colnames(useful_data)[4]<-"To"
 
 ############USEFUL FUNCTIONS
 
@@ -81,7 +83,7 @@ mostcommon <- function(text_df,n=1,x=20, which_text = "Subject") {
                 #only keep the bigrams
                 top_x <- top_x[,!(names(top_x) %in% c("word1","word2"))]
         }
-        who<-rep(text_df$who[1],x)
+        who<-rep(text_df$To[1],x)
         return(cbind(top_x,who))
 }
 
@@ -97,7 +99,7 @@ individual_emails<-function(source_data, who = "Ross"){
 
         #vector to take the instances where the match is true
         who<-paste0("\\b",tolower(who),"\\b")
-        v<-grepl(who, tolower(source_data$who))
+        v<-grepl(who, tolower(source_data$To))
         #filter on matches
         person_data<-(source_data[v,])
         return(person_data)
@@ -108,17 +110,20 @@ individual_emails<-function(source_data, who = "Ross"){
 #######Call Functions and get some data ready for the UI/Server calls
 ##Mostly calls to the whole corpus
 
-email_text<-tidy_stop(raw_data, which_text = "email")
-subject_text<-tidy_stop(raw_data, which_text = "Subject")
+email_text<-tidy_stop(useful_data, which_text = "Email")
+subject_text<-tidy_stop(useful_data, which_text = "Subject")
 subject_corpus<-subject_text$word
 email_corpus<-email_text$word
-commonBigrams <- raw_data %>% mostcommon(n=2)
-commonBigrams_email <- raw_data %>% mostcommon(n=2, which_text = "email")
+commonBigrams <- useful_data %>% mostcommon(n=2)
+commonBigrams_email <- useful_data %>% mostcommon(n=2, which_text = "Email")
 
 
 #######TESTBED for code before i drop it in server.ui
 ggplot(commonBigrams, aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
         xlab("Terms") + ylab("Count") + coord_flip()
+
+
+dplyr::n_distinct(email_text)
 
 #subject_text %>%
 #        count(word) %>%
@@ -127,8 +132,8 @@ ggplot(commonBigrams, aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "ide
 
 ### Sentiment cloud
 ####Default is Ross
-ind_emails_def<-individual_emails(raw_data)
-ind_text_def<-tidy_stop_email(ind_emails_def)
+ind_emails_def<-individual_emails(useful_data)
+ind_text_def<-tidy_stop(ind_emails_def, which_text = "Email")
 to_plot  <- ind_text_def %>%
         inner_join(bing) %>%
         count(word, sentiment, sort = TRUE) %>%

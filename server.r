@@ -33,20 +33,20 @@ function(input, output, session)
         ####### OUTPUT FOR ONE PERSON
         ##MAke reactive versions of the functions in server.
         indiv_corpus<-reactive({
-        ind_emails<-individual_emails(raw_data, input$Who_emailed)
+        ind_emails<-individual_emails(useful_data, input$Who_emailed)
         ind_text<-tidy_stop(ind_emails, which_text="email")
         return(ind_text)
         })
 
         indiv_Bigrams<-reactive({
-                ind_emails<-individual_emails(raw_data, input$Who_emailed)
+                ind_emails<-individual_emails(useful_data, input$Who_emailed)
                 com_Big<-mostcommon(ind_emails, n=2)
                 return(com_Big)
         })
 
         indiv_Bigrams_email<-reactive({
-                ind_emails<-individual_emails(raw_data, input$Who_emailed)
-                com_Big<-mostcommon(ind_emails, n=2, which_text = "email")
+                ind_emails<-individual_emails(useful_data, input$Who_emailed)
+                com_Big<-mostcommon(ind_emails, n=2, which_text = "Email")
                 return(com_Big)
         })
 
@@ -79,12 +79,12 @@ function(input, output, session)
                 sent_to<-c(input$Person1, input$Person2)
                 for (i in 1:length(sent_to)){
                         if (i==1){
-                                input_data<-individual_emails(raw_data, who=sent_to[i])
+                                input_data<-individual_emails(useful_data, who=sent_to[i])
                                 #commonWords <- input_data %>% mostcommon() %>% cbind(sent_to[i])
                                 commonBigrams <- input_data %>% mostcommon(n=2) %>% cbind(sent_to[i])
                         }
                         else {
-                                input_data<-individual_emails(raw_data, who=sent_to[i])
+                                input_data<-individual_emails(useful_data, who=sent_to[i])
                                 #commonWords <- input_data %>% mostcommon() %>% cbind(sent_to[i]) %>% rbind(commonWords)
                                 commonBigrams <- input_data %>% mostcommon(n=2) %>% cbind(sent_to[i]) %>% rbind(commonBigrams)
                         }
@@ -93,20 +93,20 @@ function(input, output, session)
         })
 
         multi_bigrams_email<-reactive({
+                #choosing tex=1 for words; tex = 2 for bigrams
+                tex<-1
                 sent_to<-c(input$Person1, input$Person2)
                 for (i in 1:length(sent_to)){
                         if (i==1){
-                                input_data<-individual_emails(raw_data, who=sent_to[i])
-                                #commonWords <- input_data %>% mostcommon() %>% cbind(sent_to[i])
-                                commonBigrams <- input_data %>% mostcommon(n=2, which_text = "email") %>% cbind(sent_to[i])
+                                input_data<-individual_emails(useful_data, who=sent_to[i])
+                                commonText <- input_data %>% mostcommon(n=1, which_text = "Email") %>% cbind(sent_to[i])
                         }
                         else {
-                                input_data<-individual_emails(raw_data, who=sent_to[i])
-                                #commonWords <- input_data %>% mostcommon() %>% cbind(sent_to[i]) %>% rbind(commonWords)
-                                commonBigrams <- input_data %>% mostcommon(n=2, which_text = "email") %>% cbind(sent_to[i]) %>% rbind(commonBigrams)
+                                input_data<-individual_emails(useful_data, who=sent_to[i])
+                                commonText <- input_data %>% mostcommon(n=1, which_text = "Email") %>% cbind(sent_to[i]) %>% rbind(commonText)
                         }
                 }
-                return(commonBigrams)
+                return(commonText)
         })
 
 
@@ -114,7 +114,7 @@ function(input, output, session)
                          xlab("Terms") + ylab("Count") + coord_flip() +  facet_wrap(~who, ncol = 3, scales = "free_x")
          })
 
-         output$multiplot_email <- renderPlot({ggplot(multi_bigrams_email(), aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
+         output$multiplot_email <- renderPlot({ggplot(multi_bigrams_email(), aes(x = word, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
                          xlab("Terms") + ylab("Count") + coord_flip() +  facet_wrap(~who, ncol = 3, scales = "free_x")
          })
 
@@ -142,7 +142,7 @@ function(input, output, session)
 
 
         ####Default is Ross
-        ind_emails_def<-individual_emails(raw_data)
+        ind_emails_def<-individual_emails(useful_data)
         ind_text_def<-tidy_stop(ind_emails_def, which_text=email)
         #For basic word cloud
         indiv_corpus_def<-ind_text_def$word
@@ -151,10 +151,6 @@ function(input, output, session)
                 wordcloud(indiv_corpus_def, max.words = input$max, scale = c(4,0.5), rot.per = 0.35,
                           min.freq = input$freq, random.order = FALSE)
         })
-
-
-
-
 
 
 
