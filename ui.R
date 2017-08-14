@@ -9,17 +9,20 @@ navbarPage("Email Analysis",
                         sidebarLayout(
                                 # Sidebar with a slider and selection inputs
                                 sidebarPanel(
-                                        sliderInput("freq",
-                                                    "Minimum Frequency:",
-                                                    min = 1,  max = 500, value = 5),
-                                        sliderInput("max",
-                                                    "Maximum Number of Words:",
-                                                    min = 1,  max = 100,  value = 50),
+                                        
                                         plotOutput("countto")
                                 ),
                                 mainPanel(
-                                        plotOutput("wholeword"),
-                                        plotOutput("all_bigrams_subj")
+                                        fluidRow(column(width=4, sliderInput("freq", "Minimum Frequency:",
+                                                                   min = 1,  max = 500, value = 5),
+                                                       sliderInput("max",
+                                                                   "Maximum Number of Words:",
+                                                                   min = 1,  max = 100,  value = 50)               
+                                                        ),
+                                                column(width=6, offset = 1, plotOutput("wholeword"))
+                                                ),
+                                        fluidRow(plotOutput("all_bigrams_subj")
+                                                )
                                 )
                         )
                )
