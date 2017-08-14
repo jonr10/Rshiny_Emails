@@ -25,11 +25,13 @@ function(input, output, session)
         output$all_bigrams_email <- renderPlot({ggplot(commonBigrams_email, aes(x = phrase, y = n, fill = who)) + geom_bar(stat = "identity", show.legend = FALSE) +
                         xlab("Terms") + ylab("Count") + coord_flip()})
 
-        output$wholeword <- renderPlot({
-                wordcloud(subject_corpus, max.words = input$max, scale = c(4,0.5), rot.per = 0.35,
-                          min.freq = input$freq, random.order = FALSE)
-                })
+        output$wholeword <- renderPlot({ wordcloud(subject_corpus, max.words = input$max, scale = c(4,0.5), rot.per = 0.35,
+                          min.freq = input$freq, random.order = FALSE) })
 
+        # inelegant hardcode of 5...
+        output$countto <- renderPlot({ ggplot(by_to[by_to$total>5,], aes(x = reorder(To,total), y = total)) + geom_bar(stat = "identity", show.legend = FALSE) +
+                 xlab("Terms") + ylab("Count") + coord_flip()  })
+        
         ####### OUTPUT FOR ONE PERSON
         ##MAke reactive versions of the functions in server.
         indiv_corpus<-reactive({

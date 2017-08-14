@@ -27,6 +27,15 @@ colnames(useful_data)[2]<-"Email"
 colnames(useful_data)[3]<-"From"
 colnames(useful_data)[4]<-"To"
 
+by_to<- useful_data %>%
+                select(To) %>%
+                group_by(To) %>%
+                summarise(total = n())
+
+#g <- ggplot(by_to[by_to$total>Th,], aes(x = reorder(To,total), y = total))
+#g + geom_bar(stat = "identity", show.legend = FALSE) +  xlab("Terms") + ylab("Count") + coord_flip()
+
+
 ############USEFUL FUNCTIONS
 
 ####Make a couple of functions to unnest and tidy up the data

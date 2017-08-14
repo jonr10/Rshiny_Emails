@@ -15,11 +15,11 @@ navbarPage("Email Analysis",
                                         sliderInput("max",
                                                     "Maximum Number of Words:",
                                                     min = 1,  max = 100,  value = 50),
-                                        plotOutput("wholeword")
+                                        plotOutput("countto")
                                 ),
                                 mainPanel(
-                                        plotOutput("all_bigrams_subj"),
-                                        plotOutput("all_bigrams_email")
+                                        plotOutput("wholeword"),
+                                        plotOutput("all_bigrams_subj")
                                 )
                         )
                )
